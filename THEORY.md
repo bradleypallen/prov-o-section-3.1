@@ -166,7 +166,7 @@ p18 → p23
 
 ## Z3 Analysis: Logical Status of Commitments
 
-The material base is encoded in Z3 (see [`prov_o_material_base.py`](prov_o_material_base.py)) to computationally distinguish two kinds of content:
+The material base is encoded in Z3 (see [`prov_o_classical_export.py`](prov_o_classical_export.py)) to computationally distinguish two kinds of content:
 
 ### 1. Logically Forced Commitments
 
