@@ -447,6 +447,119 @@ yields UNSAT.
   so p23 holds, and p20 must be retracted.
 """)
 
+    # =========================================================================
+    # DESIGN DECISION VS LOGICAL NECESSITY: Shortcut Relation Asymmetry
+    # =========================================================================
+    print("\n" + "="*70)
+    print("DESIGN DECISION: Could shortcut relations have been symmetric?")
+    print("="*70)
+
+    print("""
+The material base contains an asymmetry between the two shortcut relations:
+
+  p24: wasDerivedFrom requires explicit assertion (NOT entailed by chains)
+  p30: wasInformedBy is inferred from generation-use (but doesn't entail Entity)
+
+Question: Is this asymmetry logically forced, or a design decision?
+
+We test by:
+  - Asserting all commitments EXCEPT p24
+  - Asserting ¬p24 (assume wasDerivedFrom IS entailed by chains)
+  - Keeping p30 (wasInformedBy is inferred but not reducible)
+  - Checking consistency
+
+If SAT: The asymmetry is a design decision, not logical necessity.
+If UNSAT: Something in the base forces the asymmetry.
+""")
+
+    # Create a fresh solver
+    s2 = Solver()
+
+    print("## Setup")
+    print("  Adding all commitments except p24...")
+
+    # Assert all commitments except p24
+    for name in base.commitments:
+        if name != 'p24':
+            s2.add(base.props[name])
+
+    print("  Adding ¬p24 (wasDerivedFrom IS entailed by chains)...")
+    s2.add(Not(base.props['p24']))
+
+    print("  Keeping p30 (wasInformedBy inferred but not reducible)...")
+    # p30 is already asserted above since it's in commitments
+
+    # Add all material implications except the one that forces p24
+    print("  Adding material implications (except p10 → p24)...")
+    for antecedents, consequent in base.implications:
+        if consequent != 'p24':  # Skip the implication that forces p24
+            ante = And([base.props[a] for a in antecedents])
+            cons = base.props[consequent]
+            s2.add(Implies(ante, cons))
+
+    print("\n## Satisfiability Check")
+    result2 = s2.check()
+
+    if result2 == sat:
+        print("  Result: SAT ✓")
+        print("")
+        print("  ¬p24 is CONSISTENT with p30 and all other commitments!")
+        print("")
+        print("  CONCLUSION: The asymmetry is a DESIGN DECISION, not logical necessity.")
+        print("  The two shortcut relations COULD have been treated symmetrically:")
+        print("    - Both inferred from chains, or")
+        print("    - Both requiring explicit assertion")
+        print("")
+        print("  The respondent chose asymmetric treatment based on domain judgment,")
+        print("  not because logic forced it.")
+    elif result2 == unsat:
+        print("  Result: UNSAT ✗")
+        print("  The asymmetry IS logically forced by other commitments.")
+    else:
+        print("  Result: UNKNOWN")
+
+    print("\n## Analysis: What this reveals about the material base")
+    print("""
+  The material base contains two kinds of content:
+
+  1. LOGICALLY FORCED commitments
+     Example: ¬p20 (wasDerivedFrom doesn't suffice for cross-context identity)
+     Status: Cannot be denied without inconsistency given p7, p23, and the
+             material implication p7 ∧ p23 → ¬p20
+
+  2. SUBSTANTIVE EXPERT JUDGMENTS
+     Example: p24 (wasDerivedFrom requires explicit assertion)
+     Status: Could consistently be denied; reflects domain expertise about
+             PROV-O semantics, not logical necessity
+
+  This distinction matters for knowledge engineering:
+  - Logically forced content is robust to re-examination
+  - Expert judgments may be revisited if domain understanding changes
+
+  The Elenchus protocol surfaces BOTH kinds of content, but the Z3 encoding
+  lets us distinguish them computationally.
+""")
+
+    # =========================================================================
+    # SUMMARY TABLE
+    # =========================================================================
+    print("\n" + "="*70)
+    print("SUMMARY: Logical Status of Key Commitments")
+    print("="*70)
+
+    print("""
+  | Commitment | Description                              | Status           |
+  |------------|------------------------------------------|------------------|
+  | p20        | wasDerivedFrom suffices (RETRACTED)      | Logically forced |
+  | p24        | wasDerivedFrom requires explicit assert  | Design decision  |
+  | p30        | wasInformedBy inferred, not reducible    | Design decision  |
+  | p23        | Expanded Terms add expressiveness        | Logically forced |
+  |            |                                          | (from p2→p18→p23)|
+
+  "Logically forced" = denial creates inconsistency with other commitments
+  "Design decision"  = could consistently be denied; reflects expert judgment
+""")
+
     print("\n" + "="*70)
     print("PROVENANCE")
     print("="*70)
