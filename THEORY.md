@@ -164,6 +164,74 @@ p18 → p23
 
 ---
 
+## Z3 Analysis: Logical Status of Commitments
+
+The material base is encoded in Z3 (see [`prov_o_material_base.py`](prov_o_material_base.py)) to computationally distinguish two kinds of content:
+
+### 1. Logically Forced Commitments
+
+These cannot be denied without creating inconsistency with other commitments and accepted material implications.
+
+**Example: ¬p20 (wasDerivedFrom does NOT suffice for cross-context identity)**
+
+```
+Setup:
+  - All current commitments (p1-p10, p18, p23-p30)
+  - Retracted commitment p20
+  - Material implication: p7 ∧ p23 → ¬p20
+
+Result: UNSAT
+```
+
+The retraction of p20 was **logically forced**, not a preference change. Given:
+- p7: wasDerivedFrom expresses Entity-to-Entity transformation
+- p23: Expanded Terms add genuine expressiveness
+- The material implication p7 ∧ p23 → ¬p20
+
+...asserting p20 creates inconsistency. The respondent could have contested the material implication, but PROV-CONSTRAINTS establishes that alternateOf and specializationOf have formal properties (transitivity, symmetry, attribute inheritance) that wasDerivedFrom cannot express.
+
+### 2. Substantive Expert Judgments
+
+These could consistently be denied; they reflect domain expertise rather than logical necessity.
+
+**Example: p24 (wasDerivedFrom requires explicit assertion)**
+
+```
+Setup:
+  - All commitments except p24
+  - ¬p24 (assume wasDerivedFrom IS entailed by chains)
+  - p30 still asserted (wasInformedBy inferred but not reducible)
+
+Result: SAT
+```
+
+The asymmetric treatment of shortcut relations is a **design decision**. The two relations could have been treated symmetrically:
+- Both inferred from chains, or
+- Both requiring explicit assertion
+
+The respondent chose asymmetric treatment based on domain judgment about PROV-O semantics, not because logic forced it.
+
+### Summary Table
+
+| Commitment | Description | Logical Status |
+|------------|-------------|----------------|
+| ¬p20 | wasDerivedFrom doesn't suffice | **Logically forced** |
+| p23 | Expanded Terms add expressiveness | **Logically forced** (via p2→p18→p23) |
+| p24 | wasDerivedFrom requires explicit assertion | Design decision |
+| p30 | wasInformedBy inferred, not reducible | Design decision |
+
+### Implications for Knowledge Engineering
+
+This distinction matters:
+
+- **Logically forced content** is robust to re-examination. Any revision would require retracting one of the forcing commitments or contesting the material implication.
+
+- **Design decisions** may be revisited if domain understanding changes. They represent the respondent's expert judgment at a point in time, not immutable logical constraints.
+
+The Elenchus protocol surfaces **both** kinds of content through the same dialectical process. The Z3 encoding enables post-hoc analysis to classify them.
+
+---
+
 ## Summary Statistics
 
 | Component | Count |
@@ -173,12 +241,22 @@ p18 → p23
 | Material implications (I) | 9 |
 | Explicit non-implications | 3 |
 | Retracted propositions | 1 |
+| Logically forced commitments | 2+ |
+| Design decisions | 2+ |
 
 ---
 
 ## Respondent
 
 **Paul Groth** — W3C Provenance Incubator Group, co-editor of PROV specifications.
+
+---
+
+## References
+
+- Hlobil, U. & Brandom, R. (2025). *Reasons for Logic, Logic for Reasons*. Routledge.
+- Lebo, T., Sahoo, S., & McGuinness, D. (2013). PROV-O: The PROV Ontology. W3C Recommendation.
+- Cheney, J., Missier, P., & Moreau, L. (2013). Constraints of the PROV Data Model. W3C Recommendation.
 
 ---
 
