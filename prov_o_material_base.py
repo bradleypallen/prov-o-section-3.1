@@ -361,6 +361,92 @@ def main():
         if base.query_consequence(name):
             print(f"    {name}: {base.descriptions[name]}")
 
+    # =========================================================================
+    # RETRACTION NECESSITY DEMONSTRATION
+    # =========================================================================
+    print("\n" + "="*70)
+    print("RETRACTION NECESSITY: Why p20 was logically forced out")
+    print("="*70)
+
+    print("""
+The dialectic didn't just record a change of mind about p20.
+The retraction was forced by logical necessity given the accepted
+material implication from Challenge #21.
+
+We demonstrate this by showing that:
+  - All current commitments
+  - Plus the retracted p20
+  - Plus the material implication p7 ∧ p23 → ¬p20
+
+yields UNSAT.
+""")
+
+    # Create a fresh solver for this demonstration
+    s = Solver()
+
+    # Create proposition for p20 (the retracted commitment)
+    p20 = Bool('p20')
+
+    print("## Setup")
+    print("  Adding all current commitments (p1-p10, p18, p23-p30)...")
+
+    # Assert all current commitments
+    for name in base.commitments:
+        s.add(base.props[name])
+
+    print("  Adding retracted commitment p20 (wasDerivedFrom suffices)...")
+    s.add(p20)
+
+    print("  Adding material implication: p7 ∧ p23 → ¬p20")
+    print("    (If wasDerivedFrom is transformation AND Expanded Terms add")
+    print("     expressiveness, THEN wasDerivedFrom does NOT suffice)")
+
+    # The critical material implication from Challenge #21:
+    # If wasDerivedFrom is just Entity-to-Entity transformation (p7)
+    # AND Expanded Terms add genuine expressiveness (p23),
+    # THEN wasDerivedFrom does NOT suffice for cross-context identity (¬p20)
+    s.add(Implies(And(base.props['p7'], base.props['p23']), Not(p20)))
+
+    print("\n## Satisfiability Check")
+    result = s.check()
+
+    if result == unsat:
+        print("  Result: UNSAT ✗")
+        print("")
+        print("  The retracted commitment p20 is INCONSISTENT with:")
+        print("    - p7  (wasDerivedFrom expresses transformation)")
+        print("    - p23 (Expanded Terms add expressiveness)")
+        print("    - The material implication p7 ∧ p23 → ¬p20")
+        print("")
+        print("  CONCLUSION: The retraction was logically forced.")
+        print("  The dialectic didn't just record a preference change;")
+        print("  it identified a genuine incoherence that required resolution.")
+    elif result == sat:
+        print("  Result: SAT ✓ (unexpected!)")
+        print("  The commitments are consistent — check the encoding.")
+    else:
+        print("  Result: UNKNOWN")
+
+    print("\n## The Inferential Chain")
+    print("""
+  1. p7:  wasDerivedFrom expresses Entity-to-Entity transformation
+  2. p23: Expanded Terms (specializationOf, alternateOf) add genuine
+          expressiveness beyond what wasDerivedFrom can capture
+  3. Material implication (from PROV-CONSTRAINTS analysis):
+          p7 ∧ p23 → ¬p20
+  4. Therefore: ¬p20 (wasDerivedFrom does NOT suffice for cross-context
+          Entity identity)
+
+  The respondent could have contested the material implication, but
+  PROV-CONSTRAINTS establishes that:
+    - alternateOf is an equivalence relation (transitive, symmetric)
+    - specializationOf is a strict partial order with attribute inheritance
+    - wasDerivedFrom is NOT transitive
+
+  These formal properties cannot be expressed via wasDerivedFrom alone,
+  so p23 holds, and p20 must be retracted.
+""")
+
     print("\n" + "="*70)
     print("PROVENANCE")
     print("="*70)
