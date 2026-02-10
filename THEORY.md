@@ -116,25 +116,41 @@ p24, p30 |∼
 The following were explicitly established as **not holding**:
 
 ```
-p5 |≁ p7
+p5 |≁ p7
 ```
 *Generation-use chains do NOT entail wasDerivedFrom. (Commitment #24)*
 
 ```
-p6 |≁ ∃e
+p6 |≁ ∃e
 ```
 *wasInformedBy does NOT entail intermediate Entity existence. (Commitment #30)*
 
 ```
-p7, p7 |≁ p7
+p7, p7 |≁ p7
 ```
 *wasDerivedFrom is NOT transitive. (Commitment #23, from PROV-CONSTRAINTS)*
 
 ---
 
+## Two Reasoning Modes
+
+The material base can be reasoned over in two ways, with different properties:
+
+| Property | Classical Export | NMMS Reasoner |
+|----------|------------------|---------------|
+| Weakening | ✓ Holds | ✗ Fails |
+| Base Transitivity | ✓ Holds | ✗ Fails |
+| Logical Transitivity | ✓ Holds | ✓ Holds |
+| Consistency Check | SAT/UNSAT | Derivability |
+| Substructurality | Lost | Preserved |
+
+---
+
 ## Classical Export
 
-For integration with standard KR tools, the material base can be exported to classical propositional logic:
+For integration with standard KR tools, the material base can be exported to classical propositional logic. See [`prov_o_classical_export.py`](prov_o_classical_export.py).
+
+**Important:** The classical export is *lossy*. It flattens material implications into classical conditionals, which validates Weakening and Transitivity. This loses the substructural character of the material base.
 
 ### Assertions (from C)
 ```
@@ -164,31 +180,86 @@ p18 → p23
 
 ---
 
-## Z3 Analysis: Logical Status of Commitments
+## NMMS Reasoner
 
-The material base is encoded in Z3 (see [`prov_o_classical_export.py`](prov_o_classical_export.py)) to computationally distinguish two kinds of content:
+The NMMS (Non-Monotonic Multi-Succedent) sequent calculus from Hlobil & Brandom (2025) provides the *proper* logical extension of the material base that preserves its substructural character. See [`prov_o_nmms_reasoner.py`](prov_o_nmms_reasoner.py).
+
+### Key Properties
+
+1. **No Weakening (Nonmonotonicity)**: Adding premises can defeat inferences.
+   ```
+   p2 => p18: True
+   p2, p5 => p18: False
+   ```
+
+2. **No Base Transitivity (Nontransitivity)**: Chains of base inferences don't compose.
+   ```
+   p2 => p18: True
+   p18 => p23: True
+   p2 => p23: False
+   ```
+
+3. **Logical Transitivity Holds**: Once explicitated as conditionals, transitivity is recovered.
+   ```
+   p2->p18, p18->p23 => p2->p23: True
+   ```
+
+4. **Supraclassicality**: All classical tautologies remain derivable.
+   ```
+   => p2 | ~p2: True
+   ```
+
+### Explicitation
+
+Material implications can be made explicit using logical vocabulary:
+
+| Material Implication | Explicit Conditional |
+|---------------------|---------------------|
+| p2 \|∼ p18 | p2 → p18 |
+| p3 \|∼ p27 | p3 → p27 |
+| p4 \|∼ p29 | p4 → p29 |
+| p6 \|∼ p30 | p6 → p30 |
+| p7 \|∼ p28 | p7 → p28 |
+| p9 \|∼ p25 | p9 → p25 |
+| p9 \|∼ p26 | p9 → p26 |
+| p10 \|∼ p24 | p10 → p24 |
+| p18 \|∼ p23 | p18 → p23 |
+
+Each conditional is derivable: `=> p2 -> p18` holds in NMMS.
+
+### The Key Insight
+
+NMMS separates **defeasible base-level reasoning** from **indefeasible logical-level reasoning**:
+
+- At the base level, `p2 |∼ p18` does NOT imply `p2, p5 |∼ p18` (no Weakening)
+- At the logical level, `p2->p18, p18->p23` DOES imply `p2->p23` (transitivity via Cut)
+
+The logical vocabulary (conditionals) makes material inferences *sayable* and recovers classical properties at that level, while preserving the substructural character of the base.
+
+---
+
+## Analysis: Logical Status of Commitments
+
+Both reasoning modes can distinguish two kinds of dialectical content:
 
 ### 1. Logically Forced Commitments
 
-These cannot be denied without creating inconsistency with other commitments and accepted material implications.
+These cannot be denied without creating inconsistency with other commitments.
 
 **Example: ¬p20 (wasDerivedFrom does NOT suffice for cross-context identity)**
 
-```
-Setup:
-  - All current commitments (p1-p10, p18, p23-p30)
-  - Retracted commitment p20
-  - Material implication: p7 ∧ p23 → ¬p20
+The material constraint `p7, p23 |∼ ~p20` encodes the tension that forced retraction.
 
-Result: UNSAT
-```
+| Mode | Test | Result |
+|------|------|--------|
+| Classical Export | Assert p7 ∧ p23 ∧ p20 with (p7 ∧ p23) → ¬p20 | UNSAT |
+| NMMS | p7, p23 => ~p20 | True |
 
-The retraction of p20 was **logically forced**, not a preference change. Given:
-- p7: wasDerivedFrom expresses Entity-to-Entity transformation
-- p23: Expanded Terms add genuine expressiveness
-- The material implication p7 ∧ p23 → ¬p20
+In NMMS, note the subtlety:
+- `p7, p23 => ~p20`: **True** (from base axiom)
+- `p7, p23, p20 => ~p20`: **False** (no Weakening!)
 
-...asserting p20 creates inconsistency. The respondent could have contested the material implication, but PROV-CONSTRAINTS establishes that alternateOf and specializationOf have formal properties (transitivity, symmetry, attribute inheritance) that wasDerivedFrom cannot express.
+The constraint is *exact*: the sequent `p7, p23 ⊢ ~p20` rules out asserting p7 and p23 while denying ~p20. NMMS preserves this precision.
 
 ### 2. Substantive Expert Judgments
 
@@ -196,20 +267,14 @@ These could consistently be denied; they reflect domain expertise rather than lo
 
 **Example: p24 (wasDerivedFrom requires explicit assertion)**
 
-```
-Setup:
-  - All commitments except p24
-  - ¬p24 (assume wasDerivedFrom IS entailed by chains)
-  - p30 still asserted (wasInformedBy inferred but not reducible)
+| Mode | Test | Result |
+|------|------|--------|
+| Classical Export | Assert all commitments with ¬p24 instead of p24 | SAT |
+| NMMS | => p24 | False |
+| NMMS | => ~p24 | False |
+| NMMS | ~p24, p30 => contradiction | False |
 
-Result: SAT
-```
-
-The asymmetric treatment of shortcut relations is a **design decision**. The two relations could have been treated symmetrically:
-- Both inferred from chains, or
-- Both requiring explicit assertion
-
-The respondent chose asymmetric treatment based on domain judgment about PROV-O semantics, not because logic forced it.
+Neither p24 nor ~p24 is derivable from the base. The asymmetric treatment of shortcut relations is a *design decision*, not logically forced.
 
 ### Summary Table
 
@@ -222,13 +287,11 @@ The respondent chose asymmetric treatment based on domain judgment about PROV-O 
 
 ### Implications for Knowledge Engineering
 
-This distinction matters:
-
 - **Logically forced content** is robust to re-examination. Any revision would require retracting one of the forcing commitments or contesting the material implication.
 
 - **Design decisions** may be revisited if domain understanding changes. They represent the respondent's expert judgment at a point in time, not immutable logical constraints.
 
-The Elenchus protocol surfaces **both** kinds of content through the same dialectical process. The Z3 encoding enables post-hoc analysis to classify them.
+The Elenchus protocol surfaces **both** kinds of content through the same dialectical process. The reasoners enable post-hoc analysis to classify them.
 
 ---
 
