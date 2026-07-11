@@ -138,6 +138,14 @@ and the respondent and opponent modeled as `prov:Agent`s. The vocabulary used
 for reification is deliberately minimal; alignment to a standard pattern
 (RDF-star, named graphs) is future work.
 
+The dialogical provenance is also serialized as PROV-N in
+[`material-base.provn`](material-base.provn) and validates against the
+[PROV-CONSTRAINTS](https://www.w3.org/TR/prov-constraints/) specification
+via the [openprovenance.org ProvValidator](https://openprovenance.org/service/validator.html)
+(checked 2026-07-11): the validation report, archived in
+[`validation-report.json`](validation-report.json), shows no constraint
+violations, cycles, failed merges, or type overlaps.
+
 ## References
 
 - Lebo, T., Sahoo, S., & McGuinness, D. (2013). [PROV-O: The PROV Ontology](https://www.w3.org/TR/prov-o/). W3C Recommendation.
