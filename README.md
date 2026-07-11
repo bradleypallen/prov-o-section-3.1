@@ -127,6 +127,17 @@ This dialectic was conducted using the Elenchus protocol, which:
 
 All dialectical state is persisted in GitHub issues at [bradleypallen/prov-o-section-3.1](https://github.com/bradleypallen/prov-o-section-3.1).
 
+## RDF Export
+
+The material base is available as RDF in [`material-base.ttl`](material-base.ttl):
+atomic propositions as resources, each material implication reified and linked
+to its antecedent and consequent propositions, and dialogical provenance
+expressed in PROV-O itself — each implication `prov:wasGeneratedBy` the dialogue
+move that accepted it, with moves linking to the GitHub issues that record them
+and the respondent and opponent modeled as `prov:Agent`s. The vocabulary used
+for reification is deliberately minimal; alignment to a standard pattern
+(RDF-star, named graphs) is future work.
+
 ## References
 
 - Lebo, T., Sahoo, S., & McGuinness, D. (2013). [PROV-O: The PROV Ontology](https://www.w3.org/TR/prov-o/). W3C Recommendation.

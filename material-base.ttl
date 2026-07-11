@@ -1,0 +1,270 @@
+@prefix mb:   <https://github.com/bradleypallen/prov-o-section-3.1/vocab#> .
+@prefix :     <https://github.com/bradleypallen/prov-o-section-3.1/base#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# RDF export of the material base produced by the Elenchus
+# prover-skeptic dialectic over W3C PROV-O Section 3.1
+# ("Starting Point Terms").
+#
+# Each material implication is reified as an mb:MaterialImplication
+# linking antecedent and consequent propositions, and carries its
+# dialogical provenance in PROV-O: the implication
+# prov:wasGeneratedBy the dialogue move that accepted it, each move
+# links (rdfs:seeAlso) to the GitHub issue that records it, and the
+# respondent and opponent are prov:Agents.
+#
+# The mb: vocabulary is deliberately minimal and ad hoc; alignment
+# to a standard reification pattern (RDF-star, named graphs) is
+# future work.
+#
+# Dialectic conducted 2026-02-07 and 2026-02-09; opponent: Claude
+# Opus 4.6 running as a Claude Code agent
+# (https://github.com/bradleypallen/elenchus).
+#################################################################
+
+### Minimal vocabulary ##########################################
+
+mb:MaterialBase a rdfs:Class ;
+    rdfs:comment "A material base <L, |~> in the sense of Hlobil and Brandom (2025): an atomic language together with a base consequence relation." .
+mb:Proposition a rdfs:Class ;
+    rdfs:comment "An atomic proposition in the language L of a material base." .
+mb:MaterialImplication a rdfs:Class ;
+    rdfs:comment "A reified element of the base consequence relation |~: asserting every antecedent while denying every consequent is incoherent." .
+mb:DialogueMove a rdfs:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:comment "A move in an Elenchus prover-skeptic dialectic." .
+mb:proposition a rdf:Property ;
+    rdfs:domain mb:MaterialBase ; rdfs:range mb:Proposition .
+mb:implication a rdf:Property ;
+    rdfs:domain mb:MaterialBase ; rdfs:range mb:MaterialImplication .
+mb:antecedent a rdf:Property ;
+    rdfs:domain mb:MaterialImplication ; rdfs:range mb:Proposition .
+mb:consequent a rdf:Property ;
+    rdfs:domain mb:MaterialImplication ; rdfs:range mb:Proposition .
+
+### Agents ######################################################
+
+:respondent a prov:Agent, prov:Person ;
+    rdfs:label "Respondent: domain expert (W3C Provenance Incubator Group principal member; PROV specification co-editor)" .
+
+:opponent a prov:Agent, prov:SoftwareAgent ;
+    rdfs:label "Opponent: Elenchus agent (Claude Opus 4.6, Claude Code)" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/elenchus> .
+
+### The material base ###########################################
+
+:base a mb:MaterialBase ;
+    rdfs:label "Material base from the Elenchus dialectic over PROV-O Section 3.1" ;
+    prov:wasAttributedTo :respondent ;
+    mb:proposition :p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10,
+                   :p18, :p23, :p24, :p25, :p26, :p27, :p28, :p29, :p30 ;
+    mb:implication :i1, :i2, :i3, :i4, :i5, :i6, :i7, :i8, :i9 .
+
+### Propositions (initial commitments, session of 2026-02-07) ###
+
+:p1 a mb:Proposition ; rdfs:label "p1" ;
+    rdfs:comment "Three core classes form the basis of PROV-O: Entity, Activity, Agent" ;
+    prov:wasGeneratedBy :move1 .
+:p2 a mb:Proposition ; rdfs:label "p2" ;
+    rdfs:comment "prov:Entity is a thing with fixed aspects; may be physical, digital, conceptual, real or imaginary" ;
+    prov:wasGeneratedBy :move2 .
+:p3 a mb:Proposition ; rdfs:label "p3" ;
+    rdfs:comment "prov:Activity is something that occurs over time and acts upon or with entities" ;
+    prov:wasGeneratedBy :move3 .
+:p4 a mb:Proposition ; rdfs:label "p4" ;
+    rdfs:comment "prov:Agent bears responsibility for activities, entities, or other agents' activities" ;
+    prov:wasGeneratedBy :move4 .
+:p5 a mb:Proposition ; rdfs:label "p5" ;
+    rdfs:comment "prov:used and prov:wasGeneratedBy relate Activities to Entities they consume and produce" ;
+    prov:wasGeneratedBy :move5 .
+:p6 a mb:Proposition ; rdfs:label "p6" ;
+    rdfs:comment "prov:wasInformedBy provides Activity-to-Activity dependency without specifying the intermediate Entity" ;
+    prov:wasGeneratedBy :move6 .
+:p7 a mb:Proposition ; rdfs:label "p7" ;
+    rdfs:comment "prov:wasDerivedFrom expresses Entity-to-Entity transformation without specifying the intermediate Activity" ;
+    prov:wasGeneratedBy :move7 .
+:p8 a mb:Proposition ; rdfs:label "p8" ;
+    rdfs:comment "prov:wasAssociatedWith and prov:wasAttributedTo ascribe Agent responsibility for Activities and Entities" ;
+    prov:wasGeneratedBy :move8 .
+:p9 a mb:Proposition ; rdfs:label "p9" ;
+    rdfs:comment "prov:actedOnBehalfOf expresses delegation: one Agent acting for another who also bears responsibility" ;
+    prov:wasGeneratedBy :move9 .
+:p10 a mb:Proposition ; rdfs:label "p10" ;
+    rdfs:comment "Three types of provenance chains: Activity-Entity, Activity-only, Entity-only" ;
+    prov:wasGeneratedBy :move10 .
+
+### Propositions (challenge resolutions, session of 2026-02-09) #
+
+:p18 a mb:Proposition ; rdfs:label "p18" ;
+    rdfs:comment "'Fixed aspects' is pragmatic (context-relative); change is modeled via derivation (new Entities)" ;
+    prov:wasGeneratedBy :move11 .
+:p23 a mb:Proposition ; rdfs:label "p23" ;
+    rdfs:comment "Expanded Terms (specializationOf, alternateOf) add expressiveness, not just convenience" ;
+    prov:wasGeneratedBy :move19 .
+:p24 a mb:Proposition ; rdfs:label "p24" ;
+    rdfs:comment "wasDerivedFrom is not entailed by generation-use chains; requires explicit assertion" ;
+    prov:wasGeneratedBy :move17 .
+:p25 a mb:Proposition ; rdfs:label "p25" ;
+    rdfs:comment "Delegation responsibility is hierarchical: principal has primary, delegate has secondary" ;
+    prov:wasGeneratedBy :move16 .
+:p26 a mb:Proposition ; rdfs:label "p26" ;
+    rdfs:comment "Delegation responsibility is transitive" ;
+    prov:wasGeneratedBy :move16 .
+:p27 a mb:Proposition ; rdfs:label "p27" ;
+    rdfs:comment "Activities are durational; instantaneous occurrences are modeled via InstantaneousEvents" ;
+    prov:wasGeneratedBy :move12 .
+:p28 a mb:Proposition ; rdfs:label "p28" ;
+    rdfs:comment "wasDerivedFrom is broad (all causal content dependencies); subtypes provide specificity" ;
+    prov:wasGeneratedBy :move15 .
+:p29 a mb:Proposition ; rdfs:label "p29" ;
+    rdfs:comment "Agency is pragmatic: the same causal chain may have different Agents depending on modeling context" ;
+    prov:wasGeneratedBy :move13 .
+:p30 a mb:Proposition ; rdfs:label "p30" ;
+    rdfs:comment "wasInformedBy is inferred from generation-use pairs, but does not entail an intermediate Entity exists" ;
+    prov:wasGeneratedBy :move14 .
+
+### Retracted commitment (not in the base) ######################
+
+:p20 a mb:Proposition ; rdfs:label "p20 (retracted)" ;
+    rdfs:comment "wasDerivedFrom suffices for cross-context Entity identity; Expanded Terms are useful but not necessary" ;
+    prov:wasGeneratedBy :move19a ;
+    prov:wasInvalidatedBy :move19 .
+
+### Material implications #######################################
+
+:i1 a mb:MaterialImplication ; rdfs:label "p2 |~ p18" ;
+    mb:antecedent :p2 ; mb:consequent :p18 ;
+    prov:wasGeneratedBy :move11 ; prov:wasAttributedTo :respondent .
+:i2 a mb:MaterialImplication ; rdfs:label "p3 |~ p27" ;
+    mb:antecedent :p3 ; mb:consequent :p27 ;
+    prov:wasGeneratedBy :move12 ; prov:wasAttributedTo :respondent .
+:i3 a mb:MaterialImplication ; rdfs:label "p4 |~ p29" ;
+    mb:antecedent :p4 ; mb:consequent :p29 ;
+    prov:wasGeneratedBy :move13 ; prov:wasAttributedTo :respondent .
+:i4 a mb:MaterialImplication ; rdfs:label "p6 |~ p30" ;
+    mb:antecedent :p6 ; mb:consequent :p30 ;
+    prov:wasGeneratedBy :move14 ; prov:wasAttributedTo :respondent .
+:i5 a mb:MaterialImplication ; rdfs:label "p7 |~ p28" ;
+    mb:antecedent :p7 ; mb:consequent :p28 ;
+    prov:wasGeneratedBy :move15 ; prov:wasAttributedTo :respondent .
+:i6 a mb:MaterialImplication ; rdfs:label "p9 |~ p25" ;
+    mb:antecedent :p9 ; mb:consequent :p25 ;
+    prov:wasGeneratedBy :move16 ; prov:wasAttributedTo :respondent .
+:i7 a mb:MaterialImplication ; rdfs:label "p9 |~ p26" ;
+    mb:antecedent :p9 ; mb:consequent :p26 ;
+    prov:wasGeneratedBy :move16 ; prov:wasAttributedTo :respondent .
+:i8 a mb:MaterialImplication ; rdfs:label "p10 |~ p24" ;
+    mb:antecedent :p10 ; mb:consequent :p24 ;
+    prov:wasGeneratedBy :move17 ; prov:wasAttributedTo :respondent .
+:i9 a mb:MaterialImplication ; rdfs:label "p18 |~ p23" ;
+    mb:antecedent :p18 ; mb:consequent :p23 ;
+    prov:wasGeneratedBy :move19 ; prov:wasAttributedTo :respondent .
+
+### Dialogue moves ##############################################
+
+# Initial commitment extraction (2026-02-07)
+
+:move1 a mb:DialogueMove ; rdfs:label "Commitment: p1 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/1> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move2 a mb:DialogueMove ; rdfs:label "Commitment: p2 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/2> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move3 a mb:DialogueMove ; rdfs:label "Commitment: p3 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/3> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move4 a mb:DialogueMove ; rdfs:label "Commitment: p4 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/4> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move5 a mb:DialogueMove ; rdfs:label "Commitment: p5 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/5> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move6 a mb:DialogueMove ; rdfs:label "Commitment: p6 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/6> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move7 a mb:DialogueMove ; rdfs:label "Commitment: p7 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/7> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move8 a mb:DialogueMove ; rdfs:label "Commitment: p8 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/8> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move9 a mb:DialogueMove ; rdfs:label "Commitment: p9 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/9> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+:move10 a mb:DialogueMove ; rdfs:label "Commitment: p10 extracted from Section 3.1 prose" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/10> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-07"^^xsd:date .
+
+# Challenge resolutions (2026-02-09)
+
+:move11 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #11 (fixed aspects; entity change?): refinement accepted, yielding p18 and p2 |~ p18" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/11>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/18> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move12 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #12 (activity duration; instants?): refinement accepted, yielding p27 and p3 |~ p27" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/12>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/27> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move13 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #13 (responsibility vs. causation?): refinement accepted, yielding p29 and p4 |~ p29" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/13>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/29> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move14 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #14 (wasInformedBy: shortcut?): refinement accepted, yielding p30 and p6 |~ p30" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/14>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/30> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move15 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #15 (derivation criteria; identity?): refinement accepted, yielding p28 and p7 |~ p28" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/15>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/28> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move16 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #16 (delegation responsibility?): refinement accepted, yielding p25, p26, p9 |~ p25, and p9 |~ p26" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/16>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/25>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/26> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move17 a mb:DialogueMove ;
+    rdfs:label "Resolution of challenge #17 (chain types equivalent?): refinement accepted, yielding p24 and p10 |~ p24" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/17>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/24> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move19a a mb:DialogueMove ;
+    rdfs:label "Commitment: p20 asserted in response to follow-up challenge #19" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/19>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/20> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
+:move19 a mb:DialogueMove ;
+    rdfs:label "Resolution of follow-up to challenge #11 (tension #22: Expanded Terms have formal properties wasDerivedFrom lacks): p20 retracted, p23 committed, yielding p18 |~ p23" ;
+    rdfs:seeAlso <https://github.com/bradleypallen/prov-o-section-3.1/issues/19>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/21>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/22>,
+                 <https://github.com/bradleypallen/prov-o-section-3.1/issues/23> ;
+    prov:wasAssociatedWith :respondent, :opponent ;
+    prov:endedAtTime "2026-02-09"^^xsd:date .
